@@ -9,6 +9,8 @@ FROM dockerfile/nodejs
 
 # Install Ghost & forever
 RUN \
+  apt-get update && apt-get install -y attr && \
+  setfattr -n user.pax.flags -v "mr" `which node` && \
   cd /tmp && \
   wget https://ghost.org/zip/ghost-latest.zip && \
   unzip ghost-latest.zip -d /ghost && \
@@ -18,6 +20,9 @@ RUN \
   npm install forever -g && \
   sed 's/127.0.0.1/0.0.0.0/' /ghost/config.example.js > /ghost/config.js && \
   useradd ghost --home /ghost
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Add files.
 ADD start.bash /ghost-start

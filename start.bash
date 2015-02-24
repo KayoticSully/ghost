@@ -11,6 +11,11 @@ THEMES="content/themes"
 NODE_ENV=${NODE_ENV:-production}
 WATCH_DIRECTORY=${WATCH_DIRECTORY:-$THEMES}
 
+# Allow node to execute on grsec kernel
+setfattr -n user.pax.flags -v "mr" `which node`
+
+cd "$GHOST"
+
 # Symlink data directory.
 mkdir -p "$OVERRIDE/$DATA"
 rm -fr "$DATA"
@@ -38,7 +43,6 @@ fi
 
 # Start Ghost
 chown -R ghost:ghost /data /ghost /ghost-override
-su ghost
 
 if [[ "$NODE_ENV" == "development" ]]; then
   COMMAND="NODE_ENV=$NODE_ENV forever --watchDirectory=$WATCH_DIRECTORY -w index.js"
@@ -46,4 +50,7 @@ else
   COMMAND="NODE_ENV=$NODE_ENV npm start"
 fi
 
+su ghost << EOF
+cd "$GHOST"
 echo "$COMMAND" ; eval $COMMAND
+EOF
