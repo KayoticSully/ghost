@@ -1,21 +1,21 @@
-#
-# Ghost Dockerfile
+
 #
 # https://github.com/dockerfile/ghost
 #
 
 # Pull base image.
-FROM dockerfile/nodejs
+#FROM dockerfile/nodejs
+FROM phusion/passenger-nodejs
 
 # Install Ghost & forever
 RUN \
-  apt-get update && apt-get install -y attr && \
-  setfattr -n user.pax.flags -v "mr" `which node` && \
+  apt-get update && apt-get install -y wget unzip attr && \
   cd /tmp && \
   wget https://ghost.org/zip/ghost-latest.zip && \
   unzip ghost-latest.zip -d /ghost && \
   rm -f ghost-latest.zip && \
   cd /ghost && \
+  setfattr -n user.pax.flags -v "mr" `which node` && \
   npm install --production && \
   npm install forever -g && \
   sed 's/127.0.0.1/0.0.0.0/' /ghost/config.example.js > /ghost/config.js && \
